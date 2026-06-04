@@ -63,10 +63,16 @@ export default function SideNav({ current, onChange, activePlanId }: Props) {
     >
       {/* Logo */}
       <div style={{ padding: '0 12px 32px' }}>
-        <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 26, letterSpacing: '0.1em', color: 'var(--accent)' }}>
-          FORGE
+        <div style={{
+          fontFamily: "'Bebas Neue', sans-serif",
+          fontSize: 22,
+          letterSpacing: '0.06em',
+          color: 'var(--accent)',
+          lineHeight: 1,
+        }}>
+          Galisthenics
         </div>
-        <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: 'var(--muted)', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: 2 }}>
+        <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: 'var(--muted)', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: 3 }}>
           Training OS
         </div>
       </div>
@@ -115,9 +121,7 @@ export default function SideNav({ current, onChange, activePlanId }: Props) {
               <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: 'var(--muted)', letterSpacing: '0.08em', marginBottom: 6, textTransform: 'uppercase' }}>
                 No plan active
               </div>
-              <div style={{ fontSize: 11, color: 'var(--muted2)' }}>
-                Select a plan to start training
-              </div>
+              <div style={{ fontSize: 11, color: 'var(--muted2)' }}>Select a plan to start training</div>
             </>
           )}
         </div>

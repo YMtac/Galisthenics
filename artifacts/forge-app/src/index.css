@@ -21,11 +21,15 @@
   box-sizing: border-box;
 }
 
+html, body, #root {
+  height: 100%;
+}
+
 body {
   background: var(--bg);
   color: var(--text);
   font-family: 'DM Sans', sans-serif;
-  min-height: 100vh;
+  min-height: 100%;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
@@ -65,5 +69,34 @@ body {
 .scroll-area {
   overflow-y: auto;
   scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
 }
 .scroll-area::-webkit-scrollbar { display: none; }
+
+/* ── Mobile responsive ────────────────────────────── */
+/* Reduce top padding on small screens */
+@media (max-width: 767px) {
+  .page-top {
+    padding-top: 20px !important;
+  }
+  .page-title {
+    font-size: 34px !important;
+  }
+  .session-card {
+    border-radius: 16px !important;
+    padding: 20px 18px !important;
+  }
+  .session-title {
+    font-size: 28px !important;
+  }
+  .stat-val {
+    font-size: 22px !important;
+  }
+}
+
+/* Safe area for bottom nav (iOS notch) */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .bottom-safe {
+    padding-bottom: calc(16px + env(safe-area-inset-bottom)) !important;
+  }
+}
