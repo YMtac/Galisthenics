@@ -35,15 +35,15 @@ export default function App() {
   };
 
   return (
-    <div style={{ background: 'var(--bg)', minHeight: '100vh', display: 'flex' }}>
+    <div style={{ background: 'var(--bg)', minHeight: '100vh', display: 'flex', overflow: 'hidden' }}>
       {/* Desktop sidebar */}
       <SideNav current={page} onChange={setPage} activePlanId={activePlanId} />
 
       {/* Main content */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: '100vh', position: 'relative' }}>
+      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', minHeight: '100vh', position: 'relative', overflow: 'hidden' }}>
         <div
           className="scroll-area"
-          style={{ flex: 1, maxWidth: 520, width: '100%', margin: '0 auto' }}
+          style={{ flex: 1, maxWidth: 520, width: '100%', minWidth: 0, margin: '0 auto', overflowX: 'hidden' }}
         >
           {page === 'plan' && (
             <PlanPage
