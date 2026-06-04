@@ -18,6 +18,8 @@ export default function TrainingOverlay({ exercises, planTitle, onClose, onCompl
   const [timerVal, setTimerVal] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  // Ref always points to latest advancePhase — avoids stale-closure in setTimeout
+  const advancePhaseRef = useRef<() => void>(() => {});
 
   // Double-beep via Web Audio API — no extra files needed
   const playBeep = () => {
@@ -40,10 +42,12 @@ export default function TrainingOverlay({ exercises, planTitle, onClose, onCompl
     } catch {}
   };
 
-  // Fire beep the moment the countdown reaches its end
+  // Fire beep + auto-advance when countdown ends
   useEffect(() => {
     if (timerVal === timerMax && timerMax > 0) {
       playBeep();
+      const t = setTimeout(() => advancePhaseRef.current(), 700);
+      return () => clearTimeout(t);
     }
   }, [timerVal]);
 
@@ -100,14 +104,20 @@ export default function TrainingOverlay({ exercises, planTitle, onClose, onCompl
 
   // What's next label
   const nextLabel = () => {
-    if (!isRest) return 'tap Done when finished';
+    if (!isRest) {
+      const nextEx = exIdx + 1 < exercises.length ? exercises[exIdx + 1].name : null;
+      return nextEx ? `next: Rest → ${nextEx}` : 'next: Rest — last exercise!';
+    }
     const nextEx = exIdx + 1 < exercises.length ? exercises[exIdx + 1].name : null;
     if (nextEx) return `next: ${nextEx}`;
-    if (round + 1 < TOTAL_ROUNDS) return `next: Round ${round + 2}`;
-    return 'last exercise — almost there!';
+    if (round + 1 < TOTAL_ROUNDS) return `next: Round ${round + 2} — starting over`;
+    return 'last rest — finish strong!';
   };
 
-  const advancePhase = () => {
+  // Keep ref in sync so the auto-advance timeout always calls the latest version
+  advancePhaseRef.current = advancePhase;
+
+  function advancePhase() {
     if (!isRest) {
       // work done → go to rest
       setIsRest(true);

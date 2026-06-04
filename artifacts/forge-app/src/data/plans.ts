@@ -15,12 +15,12 @@ export const plans: Plan[] = [
   {
     id: 'cardio-abs',
     emoji: '🔥',
-    title: 'Cardio-Abs',
-    sub: 'Full-body cardio circuit + core work. 30s on / 30s off, 2 rounds',
+    title: 'Abs+Cardio (Beginner)',
+    sub: '12 exercises · 2 rounds · 30s on / 30s off · 3–5 sessions/week',
     tags: ['cardio', 'beginner'],
     weeks: 8,
     daysPerWeek: 4,
-    sessionMinutes: 22,
+    sessionMinutes: 24,
   },
   {
     id: 'ppl',

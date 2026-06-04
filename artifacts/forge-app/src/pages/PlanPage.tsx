@@ -128,7 +128,7 @@ export default function PlanPage({ activePlanId, onGoExplore, onStartSession }: 
             Today · Full Circuit
           </div>
           <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 36, letterSpacing: '0.04em', color: '#0a0a0a', lineHeight: 1, marginBottom: 4 }}>
-            Cardio-Abs<br />Circuit
+            {activePlan.title}
           </div>
           <div style={{ fontSize: 13, color: 'rgba(0,0,0,0.6)', marginBottom: 20 }}>
             {cardioAbsExercises.length} exercises · 30s on / 30s off
