@@ -30,6 +30,21 @@ export const cardioAbsExercises: Exercise[] = [
     ],
   },
   {
+    id: 'leg-raises',
+    name: 'Leg Raises',
+    icon: '🦵',
+    video: '/videos/leg-raises.mp4',
+    sub: '30s on · 30s off',
+    sets: 1,
+    work: 30,
+    rest: 30,
+    cues: [
+      '📏 Press your lower back flat to the floor',
+      '🦵 Lower legs slowly — control the descent',
+      '💪 Raise with your core, not momentum',
+    ],
+  },
+  {
     id: 'butt-kicks',
     name: 'Butt Kicks',
     icon: '🏃',
@@ -162,21 +177,6 @@ export const cardioAbsExercises: Exercise[] = [
       '📐 Hips stay stable — no rocking or dipping',
       '💪 Tap feet out wide to each side alternately',
       '🎯 Squeeze your core tight the entire time',
-    ],
-  },
-  {
-    id: 'leg-raises',
-    name: 'Leg Raises',
-    icon: '🦵',
-    video: '/videos/leg-raises.mp4',
-    sub: '30s on · 30s off',
-    sets: 1,
-    work: 30,
-    rest: 30,
-    cues: [
-      '📏 Press your lower back flat to the floor',
-      '🦵 Lower legs slowly — control the descent',
-      '💪 Raise with your core, not momentum',
     ],
   },
   {
