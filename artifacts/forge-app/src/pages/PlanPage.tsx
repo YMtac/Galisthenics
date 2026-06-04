@@ -89,8 +89,8 @@ export default function PlanPage({ activePlanId, onGoExplore, onStartSession }: 
         {/* Header */}
         <div style={{ padding: '48px 24px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
           <div>
-            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: 'var(--muted)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 4 }}>
-              Active Plan
+            <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 20, letterSpacing: '0.08em', color: 'var(--accent)', lineHeight: 1, marginBottom: 6 }}>
+              Galisthenics
             </div>
             <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 42, letterSpacing: '0.04em', lineHeight: 1 }}>
               Today's<br />Session
@@ -189,8 +189,8 @@ export default function PlanPage({ activePlanId, onGoExplore, onStartSession }: 
   return (
     <div className="fade-up" style={{ paddingBottom: 96, minHeight: '100vh' }}>
       <div style={{ padding: '48px 24px 24px' }}>
-        <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: 'var(--muted)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 4 }}>
-          Active Plan
+        <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 20, letterSpacing: '0.08em', color: 'var(--accent)', lineHeight: 1, marginBottom: 6 }}>
+          Galisthenics
         </div>
         <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 42, letterSpacing: '0.04em', lineHeight: 1 }}>
           Your<br />Plan
