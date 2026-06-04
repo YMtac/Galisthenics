@@ -13,11 +13,13 @@ const filterOptions: { id: string; label: string }[] = [
 export default function ExplorePage() {
   const [filter, setFilter] = useState('all');
   const [search, setSearch] = useState('');
-  const [selectedId, setSelectedId] = useState('ppl');
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const filtered = plans.filter((p) => {
     const matchesFilter = filter === 'all' || p.tags.includes(filter as PlanTag);
-    const matchesSearch = p.title.toLowerCase().includes(search.toLowerCase()) || p.sub.toLowerCase().includes(search.toLowerCase());
+    const matchesSearch =
+      p.title.toLowerCase().includes(search.toLowerCase()) ||
+      p.sub.toLowerCase().includes(search.toLowerCase());
     return matchesFilter && matchesSearch;
   });
 
@@ -34,7 +36,8 @@ export default function ExplorePage() {
       </div>
 
       {/* Search */}
-      <div style={{ margin: '0 24px 16px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 14, display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', transition: 'border-color 0.2s' }}
+      <div
+        style={{ margin: '0 24px 16px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 14, display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', transition: 'border-color 0.2s' }}
         onFocusCapture={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--accent)'; }}
         onBlurCapture={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)'; }}
       >
@@ -57,16 +60,11 @@ export default function ExplorePage() {
             key={opt.id}
             onClick={() => setFilter(opt.id)}
             style={{
-              flexShrink: 0,
-              padding: '6px 14px',
-              borderRadius: 20,
+              flexShrink: 0, padding: '6px 14px', borderRadius: 20,
               border: `1px solid ${filter === opt.id ? 'var(--accent)' : 'var(--border)'}`,
               background: filter === opt.id ? 'var(--accent)' : 'var(--surface)',
               color: filter === opt.id ? '#0a0a0a' : 'var(--muted)',
-              fontSize: 12,
-              fontWeight: 500,
-              cursor: 'pointer',
-              transition: 'all 0.15s',
+              fontSize: 12, fontWeight: 500, cursor: 'pointer', transition: 'all 0.15s',
               fontFamily: "'DM Sans', sans-serif",
             }}
           >
@@ -77,26 +75,28 @@ export default function ExplorePage() {
 
       {/* Plan cards */}
       <div style={{ padding: '0 24px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {filtered.length === 0 && (
+          <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--muted)', fontFamily: "'JetBrains Mono', monospace", fontSize: 12 }}>
+            No plans match your search
+          </div>
+        )}
         {filtered.map((plan) => {
           const selected = selectedId === plan.id;
           return (
             <div
               key={plan.id}
-              onClick={() => setSelectedId(plan.id)}
+              onClick={() => setSelectedId(selected ? null : plan.id)}
               style={{
                 background: 'var(--surface)',
                 border: `1px solid ${selected ? 'var(--accent)' : 'var(--border)'}`,
-                borderRadius: 18,
-                overflow: 'hidden',
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-                position: 'relative',
+                borderRadius: 18, overflow: 'hidden', cursor: 'pointer',
+                transition: 'all 0.2s', position: 'relative',
               }}
             >
               {/* Select ring */}
               <div style={{
-                position: 'absolute', top: 12, right: 12,
-                width: 22, height: 22, background: 'var(--accent)', borderRadius: '50%',
+                position: 'absolute', top: 12, right: 12, width: 22, height: 22,
+                background: 'var(--accent)', borderRadius: '50%',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 opacity: selected ? 1 : 0, transition: 'opacity 0.2s',
               }}>
@@ -119,9 +119,7 @@ export default function ExplorePage() {
               {/* Tags */}
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, padding: '12px 20px' }}>
                 {plan.tags.map((tag) => (
-                  <span key={tag} className={`font-mono-app ${tagColors[tag]}`} style={{
-                    fontSize: 10, padding: '3px 8px', borderRadius: 4, letterSpacing: '0.06em', textTransform: 'uppercase',
-                  }}>
+                  <span key={tag} className={`font-mono-app ${tagColors[tag]}`} style={{ fontSize: 10, padding: '3px 8px', borderRadius: 4, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                     {tag}
                   </span>
                 ))}
@@ -133,8 +131,8 @@ export default function ExplorePage() {
                   [plan.weeks, 'Weeks'],
                   [plan.daysPerWeek, 'Days/wk'],
                   [`${plan.sessionMinutes}'`, 'Per session'],
-                ].map(([val, lbl]) => (
-                  <div key={String(lbl)} style={{ padding: 12, textAlign: 'center', borderRight: '1px solid var(--border)' }}>
+                ].map(([val, lbl], idx) => (
+                  <div key={String(lbl)} style={{ padding: 12, textAlign: 'center', borderRight: idx < 2 ? '1px solid var(--border)' : 'none' }}>
                     <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 18, color: 'var(--text)', lineHeight: 1 }}>{val}</div>
                     <div style={{ fontSize: 10, color: 'var(--muted)', marginTop: 2, fontFamily: "'JetBrains Mono', monospace" }}>{lbl}</div>
                   </div>
@@ -159,7 +157,7 @@ export default function ExplorePage() {
                   display: 'block',
                 }}
               >
-                {selected ? '✓ Current Plan' : 'Select Plan'}
+                {selected ? '✓ Selected' : 'Select Plan'}
               </button>
             </div>
           );

@@ -76,21 +76,16 @@ export default function SideNav({ current, onChange }: Props) {
               key={item.id}
               onClick={() => onChange(item.id)}
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 12,
-                padding: '12px 14px',
-                borderRadius: 12,
+                display: 'flex', alignItems: 'center', gap: 12,
+                padding: '12px 14px', borderRadius: 12,
                 border: 'none',
                 background: active ? 'rgba(200,241,53,0.1)' : 'none',
                 cursor: 'pointer',
                 color: active ? 'var(--accent)' : 'var(--muted)',
-                fontSize: 14,
-                fontWeight: 500,
+                fontSize: 14, fontWeight: 500,
                 fontFamily: "'DM Sans', sans-serif",
                 transition: 'all 0.2s',
-                textAlign: 'left',
-                width: '100%',
+                textAlign: 'left', width: '100%',
               }}
             >
               <span style={{ filter: active ? 'drop-shadow(0 0 4px var(--accent))' : 'none', flexShrink: 0 }}>
@@ -102,17 +97,14 @@ export default function SideNav({ current, onChange }: Props) {
         })}
       </nav>
 
-      {/* Bottom section */}
+      {/* Bottom section — no plan yet */}
       <div style={{ marginTop: 'auto', padding: '0 12px' }}>
         <div style={{ borderTop: '1px solid var(--border)', paddingTop: 20 }}>
           <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: 'var(--muted)', letterSpacing: '0.08em', marginBottom: 6, textTransform: 'uppercase' }}>
-            Week 4 / Day 3
+            No plan active
           </div>
-          <div style={{ height: 4, background: 'var(--border)', borderRadius: 2, overflow: 'hidden' }}>
-            <div style={{ height: '100%', width: '58%', background: 'var(--accent)', borderRadius: 2 }} />
-          </div>
-          <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 6 }}>
-            PPL Hypertrophy · 58% complete
+          <div style={{ fontSize: 11, color: 'var(--muted2)' }}>
+            Select a plan to start training
           </div>
         </div>
       </div>
