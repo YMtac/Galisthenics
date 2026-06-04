@@ -3,6 +3,7 @@ export interface Exercise {
   name: string;
   icon: string;
   video?: string;
+  image?: string;
   sub: string;
   sets: number;
   work: number;
@@ -176,6 +177,21 @@ export const cardioAbsExercises: Exercise[] = [
       '📏 Press your lower back flat to the floor',
       '🦵 Lower legs slowly — control the descent',
       '💪 Raise with your core, not momentum',
+    ],
+  },
+  {
+    id: 'plank-hold',
+    name: 'Plank Hold',
+    icon: '🧱',
+    image: '/images/plank-hold.jpg',
+    sub: '30s on · 30s off',
+    sets: 1,
+    work: 30,
+    rest: 30,
+    cues: [
+      '📐 Body in a straight line — head to heels',
+      '💪 Squeeze glutes and brace your core hard',
+      '👁️ Eyes down, neutral neck — breathe steadily',
     ],
   },
 ];

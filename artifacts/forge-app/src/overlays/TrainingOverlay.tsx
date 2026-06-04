@@ -152,6 +152,16 @@ export default function TrainingOverlay({ exercises, planTitle, onClose, onCompl
               transition: 'opacity 0.4s',
             }}
           />
+        ) : ex.image ? (
+          <img
+            src={ex.image}
+            alt={ex.name}
+            style={{
+              width: '100%', height: '100%', objectFit: 'cover',
+              opacity: isRest ? 0.2 : 1,
+              transition: 'opacity 0.4s',
+            }}
+          />
         ) : (
           <div style={{
             width: '100%', height: '100%',
