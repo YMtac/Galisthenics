@@ -10,10 +10,14 @@ const filterOptions: { id: string; label: string }[] = [
   { id: 'intermediate', label: 'Intermediate' },
 ];
 
-export default function ExplorePage() {
+interface Props {
+  activePlanId: string | null;
+  onSelectPlan: (id: string | null) => void;
+}
+
+export default function ExplorePage({ activePlanId, onSelectPlan }: Props) {
   const [filter, setFilter] = useState('all');
   const [search, setSearch] = useState('');
-  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const filtered = plans.filter((p) => {
     const matchesFilter = filter === 'all' || p.tags.includes(filter as PlanTag);
@@ -81,34 +85,34 @@ export default function ExplorePage() {
           </div>
         )}
         {filtered.map((plan) => {
-          const selected = selectedId === plan.id;
+          const isActive = activePlanId === plan.id;
           return (
             <div
               key={plan.id}
-              onClick={() => setSelectedId(selected ? null : plan.id)}
               style={{
                 background: 'var(--surface)',
-                border: `1px solid ${selected ? 'var(--accent)' : 'var(--border)'}`,
-                borderRadius: 18, overflow: 'hidden', cursor: 'pointer',
+                border: `1px solid ${isActive ? 'var(--accent)' : 'var(--border)'}`,
+                borderRadius: 18, overflow: 'hidden',
                 transition: 'all 0.2s', position: 'relative',
               }}
             >
-              {/* Select ring */}
-              <div style={{
-                position: 'absolute', top: 12, right: 12, width: 22, height: 22,
-                background: 'var(--accent)', borderRadius: '50%',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                opacity: selected ? 1 : 0, transition: 'opacity 0.2s',
-              }}>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" strokeWidth="3">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-              </div>
+              {/* Active badge */}
+              {isActive && (
+                <div style={{
+                  position: 'absolute', top: 12, right: 12,
+                  background: 'var(--accent)', borderRadius: 6,
+                  padding: '3px 8px',
+                  fontFamily: "'JetBrains Mono', monospace", fontSize: 9,
+                  letterSpacing: '0.08em', color: '#0a0a0a', fontWeight: 700,
+                }}>
+                  ACTIVE
+                </div>
+              )}
 
               {/* Header */}
               <div style={{ padding: '20px 20px 0', display: 'flex', gap: 16, alignItems: 'flex-start' }}>
                 <span style={{ fontSize: 28, lineHeight: 1, marginTop: 2 }}>{plan.emoji}</span>
-                <div style={{ flex: 1, paddingRight: 30 }}>
+                <div style={{ flex: 1, paddingRight: isActive ? 64 : 0 }}>
                   <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, letterSpacing: '0.04em', color: 'var(--text)', lineHeight: 1, marginBottom: 4 }}>
                     {plan.title}
                   </div>
@@ -139,25 +143,26 @@ export default function ExplorePage() {
                 ))}
               </div>
 
-              {/* Select button */}
+              {/* Select / Deselect button */}
               <button
+                onClick={() => onSelectPlan(isActive ? null : plan.id)}
                 style={{
                   margin: '0 20px 20px',
                   width: 'calc(100% - 40px)',
                   padding: 11,
                   borderRadius: 10,
-                  border: `1px solid ${selected ? 'var(--accent)' : 'var(--border)'}`,
-                  background: selected ? 'var(--accent)' : 'none',
-                  color: selected ? '#0a0a0a' : 'var(--muted)',
+                  border: `1px solid ${isActive ? 'var(--accent)' : 'var(--border)'}`,
+                  background: isActive ? 'var(--accent)' : 'none',
+                  color: isActive ? '#0a0a0a' : 'var(--muted)',
                   fontFamily: "'DM Sans', sans-serif",
                   fontSize: 13,
-                  fontWeight: selected ? 600 : 500,
+                  fontWeight: isActive ? 600 : 500,
                   cursor: 'pointer',
                   transition: 'all 0.2s',
                   display: 'block',
                 }}
               >
-                {selected ? '✓ Selected' : 'Select Plan'}
+                {isActive ? '✓ Active Plan' : 'Select Plan'}
               </button>
             </div>
           );

@@ -13,8 +13,18 @@ export interface Plan {
 
 export const plans: Plan[] = [
   {
-    id: 'ppl',
+    id: 'cardio-abs',
     emoji: '🔥',
+    title: 'Cardio-Abs',
+    sub: 'Full-body cardio circuit + core work. 30s on / 30s off, 2 rounds',
+    tags: ['cardio', 'beginner'],
+    weeks: 8,
+    daysPerWeek: 4,
+    sessionMinutes: 22,
+  },
+  {
+    id: 'ppl',
+    emoji: '💪',
     title: 'PPL Hypertrophy 6-Day',
     sub: 'Push · Pull · Legs split for maximum volume and muscle growth',
     tags: ['hypertrophy', 'strength', 'intermediate'],
@@ -24,7 +34,7 @@ export const plans: Plan[] = [
   },
   {
     id: '531',
-    emoji: '💪',
+    emoji: '🏋️',
     title: '5/3/1 Powerlifting',
     sub: 'Classic strength program by Jim Wendler',
     tags: ['strength', 'intermediate'],
@@ -56,7 +66,7 @@ export const plans: Plan[] = [
     id: 'cbum',
     emoji: '🏆',
     title: 'CBUM Evolved',
-    sub: 'Chris Bumstead\'s competition prep program — pure aesthetics',
+    sub: "Chris Bumstead's competition prep program — pure aesthetics",
     tags: ['hypertrophy', 'intermediate'],
     weeks: 12,
     daysPerWeek: 5,
@@ -76,8 +86,8 @@ export const plans: Plan[] = [
 
 export const tagColors: Record<PlanTag, string> = {
   strength: 'bg-[rgba(255,107,53,0.15)] text-[#ff6b35]',
-  cardio: 'bg-[rgba(68,136,255,0.15)] text-[#4488ff]',
-  hypertrophy: 'bg-[rgba(200,241,53,0.15)] text-[#c8f135]',
-  beginner: 'bg-[rgba(102,102,102,0.2)] text-[#666666]',
+  cardio: 'bg-[rgba(200,241,53,0.15)] text-[#c8f135]',
+  hypertrophy: 'bg-[rgba(68,136,255,0.15)] text-[#4488ff]',
+  beginner: 'bg-[rgba(102,102,102,0.2)] text-[#888888]',
   intermediate: 'bg-[rgba(255,68,68,0.12)] text-[#ff4444]',
 };

@@ -1,13 +1,16 @@
-import { todayExercises } from '../data/exercises';
+import type { Exercise } from '../data/exercises';
 
 interface Props {
+  exercises: Exercise[];
+  planTitle: string;
   onBack: () => void;
   onStart: () => void;
 }
 
-const durations = ['~12\'', '~9\'', '~11\'', '~8\'', '~7\'', '~7\''];
+export default function PreviewOverlay({ exercises, planTitle, onBack, onStart }: Props) {
+  const totalSets = exercises.reduce((a, e) => a + e.sets, 0);
+  const totalMin = Math.round(exercises.reduce((a, e) => a + e.sets * (e.work + e.rest), 0) / 60);
 
-export default function PreviewOverlay({ onBack, onStart }: Props) {
   return (
     <div
       className="fade-up"
@@ -29,28 +32,31 @@ export default function PreviewOverlay({ onBack, onStart }: Props) {
             width: 38, height: 38, borderRadius: 10,
             background: 'var(--surface)', border: '1px solid var(--border)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            cursor: 'pointer', color: 'var(--text)', fontSize: 18,
-            flexShrink: 0,
+            cursor: 'pointer', color: 'var(--text)', fontSize: 18, flexShrink: 0,
           }}
         >
           ←
         </button>
         <div style={{ flex: 1, padding: '0 14px' }}>
           <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: 'var(--muted)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 3 }}>
-            Push Day A · Week 4
+            Today's Session
           </div>
           <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 26, letterSpacing: '0.04em', lineHeight: 1 }}>
-            Chest & Shoulders
+            {planTitle}
           </div>
         </div>
-        <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, padding: '4px 8px', borderRadius: 4, letterSpacing: '0.08em', textTransform: 'uppercase', background: 'var(--accent2)', color: '#fff', flexShrink: 0 }}>
+        <span style={{
+          fontFamily: "'JetBrains Mono', monospace", fontSize: 10, padding: '4px 8px',
+          borderRadius: 4, letterSpacing: '0.08em', textTransform: 'uppercase',
+          background: 'var(--accent2)', color: '#fff', flexShrink: 0,
+        }}>
           TODAY
         </span>
       </div>
 
       {/* Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, margin: '0 24px 24px', flexShrink: 0 }}>
-        {[['55', 'Minutes'], ['6', 'Exercises'], ['19', 'Sets']].map(([val, lbl]) => (
+        {[[`${totalMin}`, 'Minutes'], [String(exercises.length), 'Exercises'], [String(totalSets), 'Sets']].map(([val, lbl]) => (
           <div key={lbl} style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 14, padding: '14px 10px', textAlign: 'center' }}>
             <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 26, color: 'var(--accent)', lineHeight: 1 }}>{val}</div>
             <div style={{ fontSize: 10, color: 'var(--muted)', marginTop: 3, fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.06em' }}>{lbl}</div>
@@ -65,11 +71,11 @@ export default function PreviewOverlay({ onBack, onStart }: Props) {
 
       {/* Exercise list */}
       <div style={{ padding: '0 24px', flex: 1 }}>
-        {todayExercises.map((ex, i) => (
-          <div key={ex.name} style={{
+        {exercises.map((ex, i) => (
+          <div key={ex.id} style={{
             display: 'flex', alignItems: 'center', gap: 14,
             padding: '14px 0',
-            borderBottom: i < todayExercises.length - 1 ? '1px solid var(--border)' : 'none',
+            borderBottom: i < exercises.length - 1 ? '1px solid var(--border)' : 'none',
           }}>
             <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: 'var(--muted)', minWidth: 22 }}>
               {String(i + 1).padStart(2, '0')}
@@ -80,11 +86,11 @@ export default function PreviewOverlay({ onBack, onStart }: Props) {
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)', marginBottom: 2 }}>{ex.name}</div>
               <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: 'var(--muted)' }}>
-                {ex.sets} sets × {ex.reps} reps · {ex.weight} · {ex.rest >= 120 ? '2 min' : ex.rest + 's'} rest
+                {ex.sets} sets · {ex.work}s on / {ex.rest}s off
               </div>
             </div>
-            <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 16, color: 'var(--accent2)', letterSpacing: '0.04em' }}>
-              {durations[i]}
+            <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 14, color: 'var(--accent2)', letterSpacing: '0.04em' }}>
+              {Math.round(ex.sets * (ex.work + ex.rest) / 60)}'
             </span>
           </div>
         ))}

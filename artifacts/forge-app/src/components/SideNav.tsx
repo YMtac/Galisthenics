@@ -1,8 +1,10 @@
+import { plans } from '../data/plans';
 import type { Page } from '../App';
 
 interface Props {
   current: Page;
   onChange: (p: Page) => void;
+  activePlanId: string | null;
 }
 
 const items: { id: Page; label: string; icon: React.ReactNode }[] = [
@@ -40,7 +42,9 @@ const items: { id: Page; label: string; icon: React.ReactNode }[] = [
   },
 ];
 
-export default function SideNav({ current, onChange }: Props) {
+export default function SideNav({ current, onChange, activePlanId }: Props) {
+  const activePlan = activePlanId ? plans.find((p) => p.id === activePlanId) : null;
+
   return (
     <aside
       style={{
@@ -77,15 +81,13 @@ export default function SideNav({ current, onChange }: Props) {
               onClick={() => onChange(item.id)}
               style={{
                 display: 'flex', alignItems: 'center', gap: 12,
-                padding: '12px 14px', borderRadius: 12,
-                border: 'none',
+                padding: '12px 14px', borderRadius: 12, border: 'none',
                 background: active ? 'rgba(200,241,53,0.1)' : 'none',
                 cursor: 'pointer',
                 color: active ? 'var(--accent)' : 'var(--muted)',
                 fontSize: 14, fontWeight: 500,
                 fontFamily: "'DM Sans', sans-serif",
-                transition: 'all 0.2s',
-                textAlign: 'left', width: '100%',
+                transition: 'all 0.2s', textAlign: 'left', width: '100%',
               }}
             >
               <span style={{ filter: active ? 'drop-shadow(0 0 4px var(--accent))' : 'none', flexShrink: 0 }}>
@@ -97,15 +99,27 @@ export default function SideNav({ current, onChange }: Props) {
         })}
       </nav>
 
-      {/* Bottom section — no plan yet */}
+      {/* Active plan status */}
       <div style={{ marginTop: 'auto', padding: '0 12px' }}>
         <div style={{ borderTop: '1px solid var(--border)', paddingTop: 20 }}>
-          <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: 'var(--muted)', letterSpacing: '0.08em', marginBottom: 6, textTransform: 'uppercase' }}>
-            No plan active
-          </div>
-          <div style={{ fontSize: 11, color: 'var(--muted2)' }}>
-            Select a plan to start training
-          </div>
+          {activePlan ? (
+            <>
+              <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 9, color: 'var(--accent)', letterSpacing: '0.08em', marginBottom: 6, textTransform: 'uppercase' }}>
+                Active Plan
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--text)', fontWeight: 500, marginBottom: 2 }}>{activePlan.emoji} {activePlan.title}</div>
+              <div style={{ fontSize: 11, color: 'var(--muted)' }}>{activePlan.daysPerWeek}×/week · {activePlan.sessionMinutes} min</div>
+            </>
+          ) : (
+            <>
+              <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: 'var(--muted)', letterSpacing: '0.08em', marginBottom: 6, textTransform: 'uppercase' }}>
+                No plan active
+              </div>
+              <div style={{ fontSize: 11, color: 'var(--muted2)' }}>
+                Select a plan to start training
+              </div>
+            </>
+          )}
         </div>
       </div>
     </aside>

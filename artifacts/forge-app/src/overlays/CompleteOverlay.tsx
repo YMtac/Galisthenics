@@ -1,8 +1,12 @@
 interface Props {
+  planTitle: string;
+  exerciseCount: number;
+  totalSets: number;
+  totalMinutes: number;
   onBack: () => void;
 }
 
-export default function CompleteOverlay({ onBack }: Props) {
+export default function CompleteOverlay({ planTitle, exerciseCount, totalSets, totalMinutes, onBack }: Props) {
   return (
     <div
       className="fade-up"
@@ -43,8 +47,8 @@ export default function CompleteOverlay({ onBack }: Props) {
         Session<br />Complete!
       </div>
       <div style={{ fontSize: 15, color: 'var(--muted)', marginBottom: 36, animation: 'fadeUp 0.5s 0.3s both' }}>
-        Push Day A · Chest & Shoulders<br />
-        Great work — you crushed it.
+        {planTitle}<br />
+        Great work — you crushed it! 🔥
       </div>
 
       <div style={{
@@ -52,7 +56,7 @@ export default function CompleteOverlay({ onBack }: Props) {
         width: '100%', marginBottom: 36, maxWidth: 380,
         animation: 'fadeUp 0.5s 0.35s both',
       }}>
-        {[['58', 'Minutes'], ['19', 'Sets Done'], ['6', 'Exercises']].map(([val, lbl]) => (
+        {[[String(totalMinutes), 'Minutes'], [String(totalSets), 'Sets Done'], [String(exerciseCount), 'Exercises']].map(([val, lbl]) => (
           <div key={lbl} style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 16, padding: '16px 10px', textAlign: 'center' }}>
             <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 30, color: 'var(--accent)', lineHeight: 1 }}>{val}</div>
             <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: 'var(--muted)', marginTop: 3, letterSpacing: '0.06em' }}>{lbl}</div>
