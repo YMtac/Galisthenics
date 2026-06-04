@@ -3,6 +3,132 @@ import type { Exercise } from '../data/exercises';
 
 const TOTAL_ROUNDS = 2;
 
+// ── Speak a word/number aloud via the browser's built-in speech synthesis ──
+function speakWord(text: string) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.rate = 0.95;
+  utt.pitch = 1.05;
+  utt.volume = 1;
+  window.speechSynthesis.speak(utt);
+}
+
+// ── 5-4-3-2-1 countdown splash shown before each exercise ──
+interface SplashProps {
+  exercise: Exercise;
+  isNewRound: boolean;
+  roundNum: number;
+  onDone: () => void;
+}
+
+function CountdownSplash({ exercise, isNewRound, roundNum, onDone }: SplashProps) {
+  const [count, setCount] = useState(5);
+  const [showGo, setShowGo] = useState(false);
+  const onDoneRef = useRef(onDone);
+  useEffect(() => { onDoneRef.current = onDone; }, [onDone]);
+
+  useEffect(() => {
+    speakWord('5');
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    [4, 3, 2, 1].forEach((n, i) => {
+      timers.push(setTimeout(() => { setCount(n); speakWord(String(n)); }, (i + 1) * 1000));
+    });
+    timers.push(setTimeout(() => { setShowGo(true); speakWord('Go!'); }, 5000));
+    timers.push(setTimeout(() => { onDoneRef.current(); }, 5800));
+    return () => {
+      timers.forEach(clearTimeout);
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    };
+  }, []);
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, zIndex: 300,
+      background: '#000',
+      display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center',
+      gap: 20,
+    }}>
+      {/* Label */}
+      <div style={{
+        fontFamily: "'JetBrains Mono', monospace", fontSize: 11,
+        letterSpacing: '0.18em', textTransform: 'uppercase',
+        color: 'rgba(255,255,255,0.45)',
+      }}>
+        {isNewRound ? `Round ${roundNum} — Starting Over` : 'Up Next'}
+      </div>
+
+      {/* Thumbnail */}
+      <div style={{
+        width: 130, height: 130, borderRadius: 22,
+        overflow: 'hidden', background: '#1a1a1a',
+        border: '2px solid rgba(255,255,255,0.08)',
+      }}>
+        {exercise.video ? (
+          <video src={exercise.video} muted autoPlay loop playsInline
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        ) : exercise.image ? (
+          <img src={exercise.image} alt={exercise.name}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        ) : (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', fontSize: 52 }}>
+            {exercise.icon}
+          </div>
+        )}
+      </div>
+
+      {/* Exercise name */}
+      <div style={{
+        fontFamily: "'Bebas Neue', sans-serif",
+        fontSize: 34, letterSpacing: '0.05em',
+        color: '#fff', textAlign: 'center',
+        padding: '0 40px', lineHeight: 1.1,
+      }}>
+        {exercise.name}
+      </div>
+
+      {/* Countdown number or GO! */}
+      {!showGo ? (
+        <div key={count} style={{
+          fontFamily: "'Bebas Neue', sans-serif",
+          fontSize: 130, lineHeight: 1,
+          letterSpacing: '0.02em',
+          color: 'var(--accent)',
+          animation: 'countPop 0.25s cubic-bezier(0.22,1,0.36,1)',
+        }}>
+          {count}
+        </div>
+      ) : (
+        <div style={{
+          fontFamily: "'Bebas Neue', sans-serif",
+          fontSize: 80, lineHeight: 1,
+          letterSpacing: '0.14em',
+          color: 'var(--accent)',
+          animation: 'countPop 0.2s cubic-bezier(0.22,1,0.36,1)',
+        }}>
+          GO!
+        </div>
+      )}
+
+      {/* Work duration hint */}
+      <div style={{
+        fontFamily: "'JetBrains Mono', monospace", fontSize: 12,
+        color: 'rgba(255,255,255,0.35)', letterSpacing: '0.08em',
+      }}>
+        {exercise.work}s work · {exercise.rest}s rest
+      </div>
+
+      <style>{`
+        @keyframes countPop {
+          0%   { transform: scale(1.35); opacity: 0.5; }
+          100% { transform: scale(1);    opacity: 1;   }
+        }
+      `}</style>
+    </div>
+  );
+}
+
 interface Props {
   exercises: Exercise[];
   planTitle: string;
@@ -20,6 +146,14 @@ export default function TrainingOverlay({ exercises, planTitle, onClose, onCompl
   const videoRef = useRef<HTMLVideoElement>(null);
   // Ref always points to latest advancePhase — avoids stale-closure in setTimeout
   const advancePhaseRef = useRef<() => void>(() => {});
+  // Pending transition: set while countdown splash is showing; null = no splash
+  const [pendingTransition, setPendingTransition] = useState<{
+    exIdx: number; round: number; isNewRound: boolean;
+  } | null>(null);
+  // Incremented when we need to force-restart the timer interval
+  const [timerKey, setTimerKey] = useState(0);
+  // Mutable flag so the interval callback can check without being in deps
+  const isBlockedRef = useRef(false);
 
   // Double-beep via Web Audio API — no extra files needed
   const playBeep = () => {
@@ -61,11 +195,17 @@ export default function TrainingOverlay({ exercises, planTitle, onClose, onCompl
     setIsRunning(true);
   }, [round, exIdx, isRest]);
 
-  // Countdown
+  // Keep isBlockedRef in sync with pendingTransition so interval skips during splash
+  useEffect(() => {
+    isBlockedRef.current = pendingTransition !== null;
+  }, [pendingTransition]);
+
+  // Timer interval — timerKey forces a restart after countdown finishes
   useEffect(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
     if (isRunning) {
       intervalRef.current = setInterval(() => {
+        if (isBlockedRef.current) return; // paused during countdown splash
         setTimerVal((v) => {
           if (v >= timerMax) { clearInterval(intervalRef.current!); return timerMax; }
           return v + 1;
@@ -73,7 +213,7 @@ export default function TrainingOverlay({ exercises, planTitle, onClose, onCompl
       }, 1000);
     }
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, [isRunning, timerMax]);
+  }, [isRunning, timerMax, timerKey]);
 
   // Video: reload when exercise changes
   useEffect(() => {
@@ -120,25 +260,35 @@ export default function TrainingOverlay({ exercises, planTitle, onClose, onCompl
 
   function advancePhase() {
     if (!isRest) {
-      // work done → go to rest
+      // work done → go to rest immediately (no countdown for rest)
       setIsRest(true);
       return;
     }
-    // rest done → next exercise or next round or complete
+    // rest done → show countdown splash before next exercise
     const nextExIdx = exIdx + 1;
     if (nextExIdx < exercises.length) {
-      setExIdx(nextExIdx);
-      setIsRest(false);
+      isBlockedRef.current = true;
+      setPendingTransition({ exIdx: nextExIdx, round, isNewRound: false });
     } else {
       const nextRound = round + 1;
       if (nextRound < TOTAL_ROUNDS) {
-        setRound(nextRound);
-        setExIdx(0);
-        setIsRest(false);
+        isBlockedRef.current = true;
+        setPendingTransition({ exIdx: 0, round: nextRound, isNewRound: true });
       } else {
         onComplete();
       }
     }
+  }
+
+  // Called by CountdownSplash when "GO!" finishes — applies the queued transition
+  const applyTransition = () => {
+    if (!pendingTransition) return;
+    isBlockedRef.current = false;
+    setExIdx(pendingTransition.exIdx);
+    setRound(pendingTransition.round);
+    setIsRest(false);
+    setPendingTransition(null);
+    setTimerKey((k) => k + 1); // force interval restart
   };
 
   // Round progress dots (one per exercise per round)
@@ -448,6 +598,16 @@ export default function TrainingOverlay({ exercises, planTitle, onClose, onCompl
           50% { transform: scale(1.08); }
         }
       `}</style>
+
+      {/* ── Countdown splash overlay ── */}
+      {pendingTransition && (
+        <CountdownSplash
+          exercise={exercises[pendingTransition.exIdx]}
+          isNewRound={pendingTransition.isNewRound}
+          roundNum={pendingTransition.round + 1}
+          onDone={applyTransition}
+        />
+      )}
     </div>
   );
 }
