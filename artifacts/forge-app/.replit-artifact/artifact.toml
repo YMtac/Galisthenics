@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "FORGE — Training OS"
+version = "1.0.0"
+id = "artifacts/forge-app"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19329
+
+[services.development]
+run = "pnpm --filter @workspace/forge-app run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/forge-app", "run", "build" ]
+publicDir = "artifacts/forge-app/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19329"
+BASE_PATH = "/"
