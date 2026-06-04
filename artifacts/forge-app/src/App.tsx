@@ -20,7 +20,7 @@ function getExercisesForPlan(planId: string) {
 
 export default function App() {
   const [page, setPage] = useState<Page>('plan');
-  const [activePlanId, setActivePlanId] = useState<string | null>(null);
+  const [activePlanId, setActivePlanId] = useState<string | null>('cardio-abs');
   const [overlay, setOverlay] = useState<Overlay>('none');
 
   const activePlan = activePlanId ? plans.find((p) => p.id === activePlanId) : null;

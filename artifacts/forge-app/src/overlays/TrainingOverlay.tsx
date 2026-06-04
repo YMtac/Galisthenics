@@ -19,6 +19,34 @@ export default function TrainingOverlay({ exercises, planTitle, onClose, onCompl
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
+  // Double-beep via Web Audio API — no extra files needed
+  const playBeep = () => {
+    try {
+      const ctx = new AudioContext();
+      [0, 0.22].forEach((delay) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.value = 880;
+        gain.gain.setValueAtTime(0, ctx.currentTime + delay);
+        gain.gain.linearRampToValueAtTime(0.45, ctx.currentTime + delay + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.18);
+        osc.start(ctx.currentTime + delay);
+        osc.stop(ctx.currentTime + delay + 0.18);
+      });
+      setTimeout(() => ctx.close(), 1200);
+    } catch {}
+  };
+
+  // Fire beep the moment the countdown reaches its end
+  useEffect(() => {
+    if (timerVal === timerMax && timerMax > 0) {
+      playBeep();
+    }
+  }, [timerVal]);
+
   const ex = exercises[exIdx];
   const timerMax = isRest ? ex.rest : ex.work;
 
