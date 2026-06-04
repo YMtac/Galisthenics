@@ -135,7 +135,7 @@ export const cardioAbsExercises: Exercise[] = [
   },
   {
     id: 'burpees',
-    name: 'Burpees',
+    name: 'Burpees (no push-up)',
     icon: '💥',
     video: '/videos/burpees.mp4',
     sub: '30s on · 30s off',
@@ -143,9 +143,9 @@ export const cardioAbsExercises: Exercise[] = [
     work: 30,
     rest: 30,
     cues: [
-      '⬇️ Chest to floor for a full rep',
-      '🚀 Explosive jump and clap overhead at the top',
-      '💨 Find a steady pace you can hold',
+      '⬇️ Drop hands to floor, jump feet back to plank',
+      '🚀 Jump feet back in, then explode up overhead',
+      '💨 Find a steady rhythm — quality over speed',
     ],
   },
   {
