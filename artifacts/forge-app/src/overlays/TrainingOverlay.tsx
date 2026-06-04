@@ -49,6 +49,7 @@ export default function TrainingOverlay({ exercises, planTitle, onClose, onCompl
       const t = setTimeout(() => advancePhaseRef.current(), 700);
       return () => clearTimeout(t);
     }
+    return undefined;
   }, [timerVal]);
 
   const ex = exercises[exIdx];
@@ -144,56 +145,58 @@ export default function TrainingOverlay({ exercises, planTitle, onClose, onCompl
   const totalSteps = exercises.length * TOTAL_ROUNDS;
   const doneSteps = round * exercises.length + exIdx;
 
+  // Next exercise to preview (skip rest — show the exercise coming after current)
+  const nextEx: Exercise | null = (() => {
+    if (!isRest) return exIdx + 1 < exercises.length ? exercises[exIdx + 1] : null;
+    return exIdx + 1 < exercises.length ? exercises[exIdx + 1] : null;
+  })();
+  const nextRoundComing = !nextEx && round + 1 < TOTAL_ROUNDS;
+
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 200, background: '#000', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
-      {/* ── Video zone — 50 vh ── */}
-      <div style={{ height: '50vh', flexShrink: 0, position: 'relative', background: '#000', overflow: 'hidden' }}>
-        {ex.video ? (
-          <video
-            ref={videoRef}
-            src={ex.video}
-            muted
-            playsInline
-            loop
-            style={{
-              width: '100%', height: '100%', objectFit: 'cover',
-              opacity: isRest ? 0.2 : 1,
-              transition: 'opacity 0.4s',
-            }}
-          />
-        ) : ex.image ? (
-          <img
-            src={ex.image}
-            alt={ex.name}
-            style={{
-              width: '100%', height: '100%', objectFit: 'cover',
-              opacity: isRest ? 0.2 : 1,
-              transition: 'opacity 0.4s',
-            }}
-          />
+      {/* ── Video zone — 42 vh ── */}
+      <div style={{ height: '42vh', flexShrink: 0, position: 'relative', background: '#111', overflow: 'hidden' }}>
+        {isRest ? (
+          /* During rest: show next exercise video dimmed */
+          nextEx ? (
+            nextEx.video ? (
+              <video src={nextEx.video} muted playsInline loop autoPlay
+                style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.18, transition: 'opacity 0.4s' }} />
+            ) : nextEx.image ? (
+              <img src={nextEx.image} alt={nextEx.name}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.18, transition: 'opacity 0.4s' }} />
+            ) : null
+          ) : null
         ) : (
-          <div style={{
-            width: '100%', height: '100%',
-            background: 'linear-gradient(135deg, #0d1a0d, #1a1a0d)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 80,
-            animation: isRest ? 'none' : 'breathe 2.5s ease-in-out infinite',
-          }}>
-            {isRest ? '⏳' : ex.icon}
-          </div>
+          ex.video ? (
+            <video ref={videoRef} src={ex.video} muted playsInline loop
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          ) : ex.image ? (
+            <img src={ex.image} alt={ex.name}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          ) : (
+            <div style={{
+              width: '100%', height: '100%',
+              background: 'linear-gradient(135deg, #0d1a0d, #1a1a0d)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 80, animation: 'breathe 2.5s ease-in-out infinite',
+            }}>
+              {ex.icon}
+            </div>
+          )
         )}
 
-        {/* Rest overlay */}
+        {/* Rest overlay on video */}
         {isRest && (
           <div style={{
             position: 'absolute', inset: 0,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexDirection: 'column', gap: 6,
-            background: 'rgba(0,0,0,0.55)',
+            flexDirection: 'column', gap: 10,
+            background: 'rgba(0,0,0,0.62)',
           }}>
-            <div style={{ fontSize: 52 }}>⏳</div>
-            <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 24, letterSpacing: '0.12em', color: '#4488ff' }}>REST</div>
+            <div style={{ fontSize: 48 }}>⏳</div>
+            <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, letterSpacing: '0.18em', color: '#5599ff' }}>REST</div>
           </div>
         )}
 
@@ -202,24 +205,20 @@ export default function TrainingOverlay({ exercises, planTitle, onClose, onCompl
           position: 'absolute', top: 0, left: 0, right: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '48px 20px 16px',
-          background: 'linear-gradient(to bottom, rgba(0,0,0,0.8), transparent)',
-          pointerEvents: 'none',
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0.85), transparent)',
         }}>
-          <button
-            onClick={onClose}
-            style={{
-              width: 36, height: 36, borderRadius: 10,
-              background: 'rgba(255,255,255,0.12)', border: 'none',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer', color: '#fff', fontSize: 16,
-              backdropFilter: 'blur(8px)', pointerEvents: 'all',
-            }}
-          >✕</button>
+          <button onClick={onClose} style={{
+            width: 36, height: 36, borderRadius: 10,
+            background: 'rgba(255,255,255,0.14)', border: 'none',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer', color: '#fff', fontSize: 16,
+            backdropFilter: 'blur(8px)',
+          }}>✕</button>
 
           <div style={{
             fontFamily: "'JetBrains Mono', monospace", fontSize: 11,
-            color: 'rgba(255,255,255,0.7)', letterSpacing: '0.1em',
-            background: 'rgba(0,0,0,0.45)', padding: '5px 10px', borderRadius: 6,
+            color: 'rgba(255,255,255,0.75)', letterSpacing: '0.1em',
+            background: 'rgba(0,0,0,0.5)', padding: '5px 10px', borderRadius: 6,
           }}>
             {exIdx + 1} / {exercises.length}
           </div>
@@ -233,8 +232,8 @@ export default function TrainingOverlay({ exercises, planTitle, onClose, onCompl
           </div>
         </div>
 
-        {/* Session progress bar at bottom of video */}
-        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 3, background: 'rgba(255,255,255,0.1)' }}>
+        {/* Session progress bar */}
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 3, background: 'rgba(255,255,255,0.08)' }}>
           <div style={{
             height: '100%',
             width: `${(doneSteps / totalSteps) * 100}%`,
@@ -247,92 +246,77 @@ export default function TrainingOverlay({ exercises, planTitle, onClose, onCompl
       {/* ── Bottom sheet ── */}
       <div style={{
         flex: 1, display: 'flex', flexDirection: 'column',
-        background: 'var(--bg)', borderRadius: '20px 20px 0 0',
-        marginTop: -16, position: 'relative', zIndex: 2,
+        background: 'var(--bg)', borderRadius: '24px 24px 0 0',
+        marginTop: -20, position: 'relative', zIndex: 2,
         overflow: 'hidden', minHeight: 0,
       }}>
-        <div style={{ flex: 1, padding: '18px 20px 0', overflowY: 'auto', minHeight: 0 }}>
-          {/* Exercise name */}
-          <div style={{
-            fontFamily: "'Bebas Neue', sans-serif",
-            fontSize: 28, letterSpacing: '0.04em', lineHeight: 1,
-            color: isRest ? 'var(--muted)' : 'var(--text)',
-            marginBottom: 3, transition: 'color 0.3s',
-          }}>
-            {isRest ? 'Rest' : ex.name}
-          </div>
-          <div style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 14 }}>
-            {nextLabel()}
-          </div>
+        {/* Drag handle */}
+        <div style={{ width: 36, height: 4, background: 'rgba(255,255,255,0.15)', borderRadius: 2, margin: '10px auto 0', flexShrink: 0 }} />
 
-          {/* Cues */}
-          {!isRest && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              {ex.cues.map((cue, i) => (
-                <div key={i} style={{
-                  display: 'flex', alignItems: 'flex-start', gap: 10,
-                  background: 'var(--surface)', border: '1px solid var(--border)',
-                  borderRadius: 10, padding: '9px 12px',
-                }}>
-                  <span style={{ fontSize: 13, flexShrink: 0, marginTop: 1 }}>{cue.slice(0, 2)}</span>
-                  <span style={{ fontSize: 12, color: 'var(--muted)', lineHeight: 1.5 }}>{cue.slice(2).trim()}</span>
-                </div>
-              ))}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '14px 20px 0', overflow: 'hidden', minHeight: 0 }}>
+
+          {/* Phase label + exercise name */}
+          <div style={{ flexShrink: 0, marginBottom: 10 }}>
+            <div style={{
+              fontFamily: "'JetBrains Mono', monospace", fontSize: 10,
+              letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 4,
+              color: isRest ? '#5599ff' : 'var(--accent)',
+              transition: 'color 0.3s',
+            }}>
+              {isRest ? '⏸ Resting' : '▶ Working'}
             </div>
-          )}
-        </div>
+            <div style={{
+              fontFamily: "'Bebas Neue', sans-serif",
+              fontSize: 30, letterSpacing: '0.04em', lineHeight: 1,
+              color: 'var(--text)',
+            }}>
+              {isRest ? 'Rest' : ex.name}
+            </div>
+          </div>
 
-        {/* ── Timer Controls ── */}
-        <div style={{
-          background: 'rgba(10,10,10,0.98)',
-          backdropFilter: 'blur(20px)',
-          borderTop: '1px solid var(--border)',
-          padding: '12px 20px 28px',
-          flexShrink: 0,
-        }}>
-          {/* Timer + progress bar */}
-          <div style={{ marginBottom: 10 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 7 }}>
+          {/* Timer countdown + bar */}
+          <div style={{ flexShrink: 0, marginBottom: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 7 }}>
               <div style={{
-                fontFamily: "'Bebas Neue', sans-serif", fontSize: 42,
+                fontFamily: "'Bebas Neue', sans-serif", fontSize: 54,
                 letterSpacing: '0.04em', lineHeight: 1,
-                color: isRest ? '#4488ff' : 'var(--accent)',
+                color: isRest ? '#5599ff' : 'var(--accent)',
                 transition: 'color 0.3s',
               }}>
-                {formatTime(timerVal)}
+                {formatTime(Math.max(0, timerMax - timerVal))}
               </div>
-              <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: 'var(--muted)', letterSpacing: '0.1em' }}>
-                {isRest ? 'RESTING' : 'WORKING'}
+              <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: 'var(--muted)' }}>
+                / {formatTime(timerMax)}
               </div>
             </div>
             <div style={{ height: 5, background: 'var(--border)', borderRadius: 3, overflow: 'hidden' }}>
               <div style={{
-                height: '100%', borderRadius: 3, width: `${progress}%`,
-                background: isRest ? 'linear-gradient(90deg,#4488ff,#88aaff)' : 'linear-gradient(90deg,var(--accent2),var(--accent))',
+                height: '100%', borderRadius: 3,
+                width: `${progress}%`,
+                background: isRest
+                  ? 'linear-gradient(90deg,#4477dd,#5599ff)'
+                  : 'linear-gradient(90deg,var(--accent2),var(--accent))',
                 transition: 'width 0.1s linear',
               }} />
             </div>
           </div>
 
-          {/* Buttons */}
-          <div style={{ display: 'flex', gap: 8 }}>
+          {/* Control buttons */}
+          <div style={{ display: 'flex', gap: 8, flexShrink: 0, marginBottom: 12 }}>
             <button onClick={() => adjustTime(-5)} style={{
               height: 46, borderRadius: 12, border: '1px solid var(--border)',
               background: 'var(--surface)', color: 'var(--text)',
               fontFamily: "'JetBrains Mono', monospace", fontSize: 12,
-              cursor: 'pointer', padding: '0 12px', flexShrink: 0,
-            }}>−5</button>
+              cursor: 'pointer', padding: '0 14px', flexShrink: 0,
+            }}>−5s</button>
 
-            <button
-              onClick={() => setIsRunning((r) => !r)}
-              style={{
-                flex: 1, height: 46, borderRadius: 12,
-                background: isRest ? '#4488ff' : 'var(--accent)',
-                border: 'none', color: '#0a0a0a',
-                fontFamily: "'Bebas Neue', sans-serif", fontSize: 16, letterSpacing: '0.1em',
-                cursor: 'pointer', transition: 'all 0.15s',
-              }}
-            >
+            <button onClick={() => setIsRunning((r) => !r)} style={{
+              flex: 1, height: 46, borderRadius: 12,
+              background: isRest ? '#5599ff' : 'var(--accent)',
+              border: 'none', color: isRest ? '#fff' : '#0a0a0a',
+              fontFamily: "'Bebas Neue', sans-serif", fontSize: 16, letterSpacing: '0.1em',
+              cursor: 'pointer', transition: 'all 0.15s',
+            }}>
               {isRunning ? '⏸ Pause' : '▶ Resume'}
             </button>
 
@@ -340,20 +324,120 @@ export default function TrainingOverlay({ exercises, planTitle, onClose, onCompl
               height: 46, borderRadius: 12, border: '1px solid var(--border)',
               background: 'var(--surface)', color: 'var(--text)',
               fontFamily: "'JetBrains Mono', monospace", fontSize: 12,
-              cursor: 'pointer', padding: '0 12px', flexShrink: 0,
-            }}>+5</button>
+              cursor: 'pointer', padding: '0 14px', flexShrink: 0,
+            }}>+5s</button>
 
-            <button
-              onClick={advancePhase}
-              style={{
-                flex: 1, height: 46, borderRadius: 12,
-                background: 'var(--surface2)', border: '1px solid var(--border)', color: 'var(--text)',
-                fontFamily: "'Bebas Neue', sans-serif", fontSize: 16, letterSpacing: '0.1em',
-                cursor: 'pointer',
-              }}
-            >
+            <button onClick={advancePhase} style={{
+              height: 46, borderRadius: 12,
+              background: 'var(--surface2)', border: '1px solid var(--border)', color: 'var(--text)',
+              fontFamily: "'Bebas Neue', sans-serif", fontSize: 16, letterSpacing: '0.1em',
+              cursor: 'pointer', padding: '0 14px', flexShrink: 0,
+            }}>
               {isRest ? 'Next ›' : 'Done ›'}
             </button>
+          </div>
+
+          {/* ── Next Exercise card ── */}
+          <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'flex-end', paddingBottom: 24 }}>
+            {nextEx ? (
+              <div style={{
+                width: '100%',
+                background: 'var(--surface)',
+                border: '1px solid var(--border)',
+                borderRadius: 18,
+                padding: '14px 14px',
+                display: 'flex', alignItems: 'center', gap: 14,
+              }}>
+                {/* Thumbnail */}
+                <div style={{
+                  width: 72, height: 72, borderRadius: 14,
+                  overflow: 'hidden', flexShrink: 0,
+                  background: '#222',
+                }}>
+                  {nextEx.video ? (
+                    <video src={nextEx.video} muted autoPlay loop playsInline
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : nextEx.image ? (
+                    <img src={nextEx.image} alt={nextEx.name}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', fontSize: 30 }}>
+                      {nextEx.icon}
+                    </div>
+                  )}
+                </div>
+                {/* Info */}
+                <div style={{ minWidth: 0 }}>
+                  <div style={{
+                    fontFamily: "'JetBrains Mono', monospace", fontSize: 10,
+                    color: 'var(--muted)', letterSpacing: '0.1em', textTransform: 'uppercase',
+                    marginBottom: 4,
+                  }}>
+                    Next Exercise
+                  </div>
+                  <div style={{
+                    fontFamily: "'Bebas Neue', sans-serif", fontSize: 22,
+                    letterSpacing: '0.04em', color: 'var(--text)', lineHeight: 1,
+                    marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  }}>
+                    {nextEx.name}
+                  </div>
+                  <div style={{ fontSize: 12, color: 'var(--muted)' }}>
+                    {nextEx.work}s work · {nextEx.rest}s rest
+                  </div>
+                </div>
+              </div>
+            ) : nextRoundComing ? (
+              <div style={{
+                width: '100%',
+                background: 'var(--surface)',
+                border: '1px solid var(--border)',
+                borderRadius: 18,
+                padding: '16px 18px',
+                display: 'flex', alignItems: 'center', gap: 14,
+              }}>
+                <div style={{
+                  width: 72, height: 72, borderRadius: 14,
+                  background: 'rgba(200,241,53,0.08)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 32, flexShrink: 0,
+                }}>🔁</div>
+                <div>
+                  <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: 'var(--muted)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 4 }}>
+                    Up Next
+                  </div>
+                  <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, letterSpacing: '0.04em', color: 'var(--text)', lineHeight: 1, marginBottom: 4 }}>
+                    Round {round + 2} of {TOTAL_ROUNDS}
+                  </div>
+                  <div style={{ fontSize: 12, color: 'var(--muted)' }}>Starting over from the top</div>
+                </div>
+              </div>
+            ) : (
+              <div style={{
+                width: '100%',
+                background: 'rgba(200,241,53,0.06)',
+                border: '1px solid rgba(200,241,53,0.2)',
+                borderRadius: 18,
+                padding: '16px 18px',
+                display: 'flex', alignItems: 'center', gap: 14,
+              }}>
+                <div style={{
+                  width: 72, height: 72, borderRadius: 14,
+                  background: 'rgba(200,241,53,0.1)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 32, flexShrink: 0,
+                }}>🏁</div>
+                <div>
+                  <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: 'var(--accent)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 4 }}>
+                    Last Exercise
+                  </div>
+                  <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 22, letterSpacing: '0.04em', color: 'var(--text)', lineHeight: 1, marginBottom: 4 }}>
+                    Finish Strong!
+                  </div>
+                  <div style={{ fontSize: 12, color: 'var(--muted)' }}>Session complete after this</div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
