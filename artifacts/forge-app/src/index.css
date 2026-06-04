@@ -73,6 +73,25 @@ body {
 }
 .scroll-area::-webkit-scrollbar { display: none; }
 
+/* ── Sidebar / BottomNav visibility ──────────────── */
+.sidebar {
+  display: none;
+}
+@media (min-width: 1024px) {
+  .sidebar {
+    display: flex;
+  }
+}
+
+.bottom-nav-mobile {
+  display: flex;
+}
+@media (min-width: 1024px) {
+  .bottom-nav-mobile {
+    display: none;
+  }
+}
+
 /* ── Mobile responsive ────────────────────────────── */
 /* Reduce top padding on small screens */
 @media (max-width: 767px) {

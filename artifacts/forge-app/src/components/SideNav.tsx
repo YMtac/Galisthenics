@@ -52,14 +52,13 @@ export default function SideNav({ current, onChange, activePlanId }: Props) {
         minHeight: '100vh',
         background: 'var(--surface)',
         borderRight: '1px solid var(--border)',
-        display: 'flex',
         flexDirection: 'column',
         padding: '32px 16px',
         position: 'sticky',
         top: 0,
         flexShrink: 0,
       }}
-      className="hidden lg:flex"
+      className="sidebar"
     >
       {/* Logo */}
       <div style={{ padding: '0 12px 32px' }}>

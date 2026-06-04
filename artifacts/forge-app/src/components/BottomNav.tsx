@@ -51,12 +51,11 @@ export default function BottomNav({ current, onChange }: Props) {
         background: 'rgba(10,10,10,0.92)',
         backdropFilter: 'blur(20px)',
         borderTop: '1px solid var(--border)',
-        display: 'flex',
         justifyContent: 'space-around',
         padding: '12px 0 20px',
         zIndex: 100,
       }}
-      className="lg:hidden"
+      className="bottom-nav-mobile"
     >
       {items.map((item) => {
         const active = current === item.id;
